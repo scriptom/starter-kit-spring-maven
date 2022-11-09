@@ -20,6 +20,7 @@ import com.client.core.scheduledtasks.model.helper.impl.credentialing.CandidateC
 import com.client.core.scheduledtasks.model.helper.impl.credentialing.JobSubmissionCertificationRequirementScheduledTaskHelper;
 import com.client.core.scheduledtasks.model.helper.impl.credentialing.PlacementCertificationScheduledTaskHelper;
 import com.client.core.scheduledtasks.service.EventWorkflowFactory;
+import com.client.core.scheduledtasks.tools.annotation.IgnoreOn;
 import com.client.core.scheduledtasks.workflow.node.EventTask;
 import com.client.core.scheduledtasks.workflow.traversing.ScheduledTasksTraverser;
 import com.client.core.scheduledtasks.workflow.traversing.impl.*;
@@ -29,13 +30,11 @@ import com.client.core.scheduledtasks.workflow.traversing.impl.credentialing.Job
 import com.client.core.scheduledtasks.workflow.traversing.impl.credentialing.PlacementCertificationEventTraverser;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,175 +105,263 @@ public class StandardEventWorkflowFactory implements EventWorkflowFactory {
         if (Appointment.class.equals(type)) {
             AppointmentEventTraverser traverser = new AppointmentEventTraverser(event, allRelatedEntityFields.get(Appointment.class));
 
-            appointmentNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            appointmentNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (CandidateEducation.class.equals(type)) {
             CandidateEducationEventTraverser traverser = new CandidateEducationEventTraverser(event, allRelatedEntityFields.get(CandidateEducation.class));
 
-            candidateEducationNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            candidateEducationNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (Candidate.class.equals(type)) {
             CandidateEventTraverser traverser = new CandidateEventTraverser(event, allRelatedEntityFields.get(Candidate.class));
 
-            candidateNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            candidateNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (CandidateReference.class.equals(type)) {
             CandidateReferenceEventTraverser traverser = new CandidateReferenceEventTraverser(event, allRelatedEntityFields.get(CandidateReference.class));
 
-            candidateReferenceNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            candidateReferenceNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
         } else if (CandidateWorkHistory.class.equals(type)) {
             CandidateWorkHistoryEventTraverser traverser = new CandidateWorkHistoryEventTraverser(event, allRelatedEntityFields.get(CandidateWorkHistory.class));
 
-            candidateWorkHistoryNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            candidateWorkHistoryNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (ClientContact.class.equals(type)) {
             ClientContactEventTraverser traverser = new ClientContactEventTraverser(event, allRelatedEntityFields.get(ClientContact.class));
 
-            clientContactNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            clientContactNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (ClientCorporation.class.equals(type)) {
             ClientCorporationEventTraverser traverser = new ClientCorporationEventTraverser(event, allRelatedEntityFields.get(ClientCorporation.class));
 
-            clientCorporationNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            clientCorporationNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (CorporateUser.class.equals(type)) {
             CorporateUserEventTraverser traverser = new CorporateUserEventTraverser(event, allRelatedEntityFields.get(CorporateUser.class));
 
-            corporateUserNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            corporateUserNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (JobOrder.class.equals(type)) {
             JobOrderEventTraverser traverser = new JobOrderEventTraverser(event, allRelatedEntityFields.get(JobOrder.class));
 
-            jobOrderNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            jobOrderNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (JobSubmission.class.equals(type)) {
             JobSubmissionEventTraverser traverser = new JobSubmissionEventTraverser(event, allRelatedEntityFields.get(JobSubmission.class));
 
-            jobSubmissionNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            jobSubmissionNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (Lead.class.equals(type)) {
             LeadEventTraverser traverser = new LeadEventTraverser(event, allRelatedEntityFields.get(Lead.class));
 
-            leadNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            leadNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (Note.class.equals(type)) {
             NoteEventTraverser traverser = new NoteEventTraverser(event, allRelatedEntityFields.get(Note.class));
 
-            noteNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            noteNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (Opportunity.class.equals(type)) {
             OpportunityEventTraverser traverser = new OpportunityEventTraverser(event, allRelatedEntityFields.get(Opportunity.class));
 
-            opportunityNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            opportunityNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (PlacementChangeRequest.class.equals(type)) {
             PlacementChangeRequestEventTraverser traverser = new PlacementChangeRequestEventTraverser(event, allRelatedEntityFields.get(PlacementChangeRequest.class));
 
-            placementChangeRequestNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            placementChangeRequestNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (PlacementCommission.class.equals(type)) {
             PlacementCommissionEventTraverser traverser = new PlacementCommissionEventTraverser(event, allRelatedEntityFields.get(PlacementCommission.class));
 
-            placementCommissionNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            placementCommissionNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (Placement.class.equals(type)) {
             PlacementEventTraverser traverser = new PlacementEventTraverser(event, allRelatedEntityFields.get(Placement.class));
 
-            placementNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            placementNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (Sendout.class.equals(type)) {
             SendoutEventTraverser traverser = new SendoutEventTraverser(event, allRelatedEntityFields.get(Sendout.class));
 
-            sendoutNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            sendoutNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (Task.class.equals(type)) {
             TaskEventTraverser traverser = new TaskEventTraverser(event, allRelatedEntityFields.get(Task.class));
 
-            taskNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            taskNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (CandidateCertification.class.equals(type)) {
             CandidateCertificationEventTraverser traverser = new CandidateCertificationEventTraverser(event, allRelatedEntityFields.get(CandidateCertification.class));
 
-            candidateCertificationNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            candidateCertificationNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (CandidateCertificationRequirement.class.equals(type)) {
             CandidateCertificationRequirementEventTraverser traverser = new CandidateCertificationRequirementEventTraverser(event, allRelatedEntityFields.get(CandidateCertificationRequirement.class));
 
-            candidateCertificationRequirementNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            candidateCertificationRequirementNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (JobSubmissionCertificationRequirement.class.equals(type)) {
             JobSubmissionCertificationRequirementEventTraverser traverser = new JobSubmissionCertificationRequirementEventTraverser(event, allRelatedEntityFields.get(JobSubmissionCertificationRequirement.class));
 
-            jobSubmissionCertificationRequirementNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            jobSubmissionCertificationRequirementNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         } else if (PlacementCertification.class.equals(type)) {
             PlacementCertificationEventTraverser traverser = new PlacementCertificationEventTraverser(event, allRelatedEntityFields.get(PlacementCertification.class));
 
-            placementCertificationNodes.stream().forEach((eventTask) -> {
-                eventTask.handle(traverser);
-            });
+            placementCertificationNodes.stream()
+                    .filter((eventTask) -> {
+                        return !shouldEventTaskBeIgnored(eventTask, event);
+                    })
+                    .forEach((eventTask) -> {
+                        eventTask.handle(traverser);
+                    });
 
             handleResult(traverser);
         }
@@ -290,6 +377,37 @@ public class StandardEventWorkflowFactory implements EventWorkflowFactory {
 
     private <E extends BullhornEntity, H extends ScheduledTaskHelper<E>, T extends ScheduledTasksTraverser<H>> List<EventTask<E, H, T>> sort(Optional<List<EventTask<E, H, T>>> values) {
         return values.orElseGet(Lists::newArrayList).stream().sorted().collect(Collectors.toList());
+    }
+
+    private <E extends BullhornEntity, H extends ScheduledTaskHelper<E>, T extends ScheduledTasksTraverser<H>> boolean shouldEventTaskBeIgnored(EventTask<E, H, T> eventTask, CustomSubscriptionEvent event) {
+        IgnoreOn ignoreCriteria = eventTask.getClass().getAnnotation(IgnoreOn.class);
+        if (ignoreCriteria == null) {
+            return false;
+        }
+        Integer userPrivateLabelID = getUserPrivateLabelID(event.getUpdatingUserId());
+        if (userPrivateLabelID == null) {
+            // Should never happen, but just in case...
+            return false;
+        }
+        for (String privateLabelID : ignoreCriteria.privateLabelIDs()) {
+            if (Objects.equals(privateLabelID, userPrivateLabelID.toString())) {
+                return true;
+            }
+        }
+        for (String subscriptionName : ignoreCriteria.subscriptionNames()) {
+            if (Objects.equals(subscriptionName, event.getSubscriptionName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Integer getUserPrivateLabelID(Integer userId) {
+        CorporateUser corporateUser = bullhornData.findEntity(CorporateUser.class, userId, Sets.newHashSet("privateLabel(id)"));
+        if (corporateUser == null) {
+            return null;
+        }
+        return corporateUser.getPrivateLabel().getId();
     }
 
     private Map<Class<? extends BullhornEntity>, Map<? extends BullhornRelatedEntity, Set<String>>> constructAllRelatedEntityFields() {
